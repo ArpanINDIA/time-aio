@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Vibes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      padding: 1rem;
+      background-color: rgba(255, 255, 255, 0.05);
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .clock {
+      font-size: 4rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, #ff8a00, #e52e71);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .quote {
+      font-size: 1.5rem;
+      font-style: italic;
+      max-width: 80%;
+      line-height: 1.6;
+    }
+
+    .date {
+      font-size: 1.2rem;
+      margin-top: -0.5rem;
+      color: #ccc;
+    }
+
+    button {
+      background-color: #ff8a00;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #e67100;
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <header>Live Vibes ✨</header>
+  <main>
+    <div class="clock" id="clock"></div>
+    <div class="date" id="date"></div>
+    <div class="quote" id="quote">Click the button to feel inspired!</div>
+    <button onclick="generateQuote()">Inspire Me 🌟</button>
+  </main>
+  <footer>© 2025 Live  | Stay positive, stay curious 🌈</footer>
+  
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      const date = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('clock').textContent = time;
+      document.getElementById('date').textContent = date;
+    }
+  
+    setInterval(updateClock, 1000);
+    updateClock();
+  
+    // AI-style expanded quote parts
+    const starts = [
+      "Believe in your ability to", "Let your passion", "Your future is created by what you",
+      "Push beyond limits and", "Never underestimate your power to", "With courage, you can",
+      "Greatness begins when you", "Every sunrise gives you a chance to", "You were born to",
+      "The world needs people who can", "Embrace the challenge and"
+    ];
+  
+    const middles = [
+      " inspire change,", " take bold action,", " rise from failure,", " ignite your inner fire,",
+      " grow through discomfort,", " lead with heart,", " dream without fear,", " challenge the impossible,",
+      " move with resilience,", " create something beautiful,", " discover your strength,"
+    ];
+  
+    const ends = [
+      " because the world is waiting.", " and today is your moment.", " so keep rising higher.",
+      " with purpose and pride.", " and your time is now.", " because greatness lives in you.",
+      " and nothing can stop you now.", " because limits only exist in the mind.",
+      " and the journey starts today.", " so don’t hold back.", " and the best is yet to come."
+    ];
+  
+    function generateQuote() {
+      const start = starts[Math.floor(Math.random() * starts.length)];
+      const middle = middles[Math.floor(Math.random() * middles.length)];
+      const end = ends[Math.floor(Math.random() * ends.length)];
+      document.getElementById('quote').textContent = `${start}${middle}${end}`;
+    }
+  
+    // Optional: Uncomment to auto-generate a new quote every 10 seconds
+    setInterval(generateQuote, 10000);
+  </script>
+  
+</body>
+</html>
