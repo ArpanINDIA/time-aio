@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Weather Site</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #00c6ff, #0072ff);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    #weather {
+      font-size: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background-color: #004aad;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #003080;
+    }
+  </style>
+</head>
+<body>
+  <h1> Real-Time Water Weather</h1>
+  <input type="text" id="city" placeholder="Enter city name" />
+  <button onclick="getWeather()">Get Weather</button>
+  <div id="weather">🌦 Weather info will appear here.</div>
+
+  <script>
+    const apiKey = 'YOUR_API_KEY_HERE'; // <-- Replace with your OpenWeatherMap API key
+
+    function getWeather() {
+      const city = document.getElementById('city').value;
+      const weatherDiv = document.getElementById('weather');
+
+      if (!city) {
+        weatherDiv.innerHTML = '⚠️ Please enter a city name.';
+        return;
+      }
+
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+        .then(response => {
+          if (!response.ok) throw new Error("City not found");
+          return response.json();
+        })
+        .then(data => {
+          const temp = data.main.temp;
+          const desc = data.weather[0].description;
+          const humidity = data.main.humidity;
+          const wind = data.wind.speed;
+
+          weatherDiv.innerHTML = `
+            <strong>${data.name}</strong><br>
+            🌡 Temperature: ${temp}°C<br>
+            🌧 Condition: ${desc}<br>
+            💧 Humidity: ${humidity}%<br>
+            💨 Wind Speed: ${wind} m/s
+          `;
+        })
+        .catch(error => {
+          weatherDiv.innerHTML = '❌ Error: ' + error.message;
+        });
+    }
+  </script>
+</body>
+</html>
