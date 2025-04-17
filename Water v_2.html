@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Weather Fetcher</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #00c6ff, #0072ff);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+    }
+
+    #weather {
+      font-size: 1.2rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      width: 300px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      margin-top: 10px;
+    }
+
+    input, button {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      margin: 5px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #004aad;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #003080;
+    }
+
+    #loading {
+      font-style: italic;
+      color: #d0eaff;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌍 Water Weather Fetcher</h1>
+  <input type="text" id="city" placeholder="Or enter a city..." />
+  <button onclick="getWeatherByCity()">Search</button>
+  <div id="loading"></div>
+  <div id="weather">🌦️ Waiting for location or input...</div>
+
+  <script>
+    const apiKey = 'YOUR_API_KEY_HERE'; // Replace with your OpenWeatherMap API key
+    const weatherDiv = document.getElementById('weather');
+    const loadingDiv = document.getElementById('loading');
+
+    // Fetch weather by city name
+    function getWeatherByCity() {
+      const city = document.getElementById('city').value.trim();
+      if (!city) {
+        weatherDiv.innerHTML = "⚠️ Please enter a city name.";
+        return;
+      }
+      fetchWeather(`q=${city}`);
+    }
+
+    // Fetch weather by coordinates
+    function getWeatherByCoords(lat, lon) {
+      fetchWeather(`lat=${lat}&lon=${lon}`);
+    }
+
+    // Main fetch function
+    function fetchWeather(query) {
+      loadingDiv.innerHTML = "Fetching weather data...";
+      fetch(`https://api.openweathermap.org/data/2.5/weather?${query}&appid=${apiKey}&units=metric`)
+        .then(response => {
+          if (!response.ok) throw new Error("Weather not found");
+          return response.json();
+        })
+        .then(data => {
+          loadingDiv.innerHTML = "";
+          const { name } = data;
+          const { temp, humidity } = data.main;
+          const { description } = data.weather[0];
+          const { speed } = data.wind;
+
+          weatherDiv.innerHTML = `
+            📍 <strong>${name}</strong><br>
+            🌡 Temp: ${temp}°C<br>
+            🌥 Condition: ${description}<br>
+            💧 Humidity: ${humidity}%<br>
+            💨 Wind: ${speed} m/s
+          `;
+        })
+        .catch(error => {
+          loadingDiv.innerHTML = "";
+          weatherDiv.innerHTML = `❌ Error: ${error.message}`;
+        });
+    }
+
+    // Try to auto-detect user's location
+    window.onload = function () {
+      if (navigator.geolocation) {
+        loadingDiv.innerHTML = "📍 Detecting location...";
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const { latitude, longitude } = position.coords;
+            getWeatherByCoords(latitude, longitude);
+          },
+          error => {
+            loadingDiv.innerHTML = "";
+            weatherDiv.innerHTML = "⚠️ Location access denied. Please enter a city.";
+          }
+        );
+      } else {
+        weatherDiv.innerHTML = "⚠️ Geolocation not supported by this browser.";
+      }
+    };
+  </script>
+</body>
+</html>
