@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>💦 Water Weather Tips</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    /* Water waves animated background (removed bottom wave) */
+    body {
+      background: linear-gradient(to bottom, #2193b0, #6dd5ed);
+      position: relative;
+    }
+
+    /* Floating bubbles animation */
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.7);
+      animation: float 5s linear infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+        opacity: 0.6;
+      }
+      50% {
+        transform: translateY(-200px);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 0.6;
+      }
+    }
+
+    .bubble:nth-child(1) { width: 30px; height: 30px; left: 20%; animation-duration: 6s; }
+    .bubble:nth-child(2) { width: 40px; height: 40px; left: 60%; animation-duration: 4.5s; }
+    .bubble:nth-child(3) { width: 20px; height: 20px; left: 80%; animation-duration: 7s; }
+    .bubble:nth-child(4) { width: 35px; height: 35px; left: 50%; animation-duration: 5s; }
+
+    /* Centered app UI */
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 30px;
+      max-width: 400px;
+      margin: auto;
+      margin-top: 60px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      animation: fadeIn 1.5s ease;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #e0f7ff;
+    }
+
+    input, button {
+      padding: 12px;
+      margin: 6px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    input {
+      width: 60%;
+      background-color: #ffffffcc;
+    }
+
+    button {
+      background: #0066ff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #004bcc;
+    }
+
+    #weather, #tips {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 15px;
+      animation: fadeIn 2s ease;
+    }
+
+    #clock {
+      font-size: 1.5rem;
+      margin-top: 10px;
+      color: #e6f9ff;
+      animation: fadeIn 2s ease;
+    }
+
+    #tips {
+      font-style: italic;
+      color: #e6f9ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>💧 Water Weather Tips</h1>
+    <input type="text" id="city" placeholder="Enter city..." />
+    <button onclick="fetchWeather()">Check</button>
+
+    <div id="weather">🔎 Enter a city to get started...</div>
+    <div id="tips"></div>
+    <div id="clock"></div>
+  </div>
+
+  <!-- Floating bubbles -->
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+
+  <script>
+    // Display real-time clock
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      document.getElementById('clock').textContent = `🕒 Current Time: ${time}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Function to get weather data
+    async function fetchWeather() {
+      const city = document.getElementById("city").value.trim();
+      const weatherDiv = document.getElementById("weather");
+      const tipsDiv = document.getElementById("tips");
+
+      if (!city) {
+        weatherDiv.innerHTML = "⚠️ Please enter a city.";
+        tipsDiv.innerHTML = "";
+        return;
+      }
+
+      weatherDiv.innerHTML = "🌍 Fetching weather...";
+      tipsDiv.innerHTML = "";
+
+      try {
+        const response = await fetch(`https://wttr.in/${city}?format=j1`);
+        const data = await response.json();
+
+        const area = data.nearest_area[0].areaName[0].value;
+        const country = data.nearest_area[0].country[0].value;
+        const current = data.current_condition[0];
+        const temp = parseInt(current.temp_C);
+        const desc = current.weatherDesc[0].value.toLowerCase();
+        const humidity = parseInt(current.humidity);
+        const wind = current.windspeedKmph;
+
+        weatherDiv.innerHTML = `
+          📍 <strong>${area}, ${country}</strong><br>
+          🌡 Temp: ${temp}°C<br>
+          🌥 Condition: ${desc}<br>
+          💧 Humidity: ${humidity}%<br>
+          💨 Wind: ${wind} km/h
+        `;
+
+        let tip = "";
+
+        if (temp >= 32) {
+          tip = "🔥 Hot day! Stay hydrated and reduce outdoor water use.";
+        } else if (temp <= 5) {
+          tip = "❄️ Cold weather! Insulate water pipes and store clean water.";
+        } else if (desc.includes("rain")) {
+          tip = "🌧 It's raining. Turn off garden sprinklers and reuse rainwater!";
+        } else if (humidity > 80) {
+          tip = "💦 Humid air. Watch out for mold and store water safely.";
+        } else if (desc.includes("sunny") && humidity < 30) {
+          tip = "☀️ Dry and sunny. Use mulch to retain soil moisture.";
+        } else {
+          tip = "💧 Keep water use smart and steady.";
+        }
+
+        tipsDiv.innerHTML = tip;
+
+      } catch (err) {
+        weatherDiv.innerHTML = "❌ Couldn't fetch weather.";
+        tipsDiv.innerHTML = "";
+      }
+    }
+
+    // Auto-location feature (if no city entered)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        fetchWeatherByLocation(lat, lon);
+      });
+    }
+
+    async function fetchWeatherByLocation(lat, lon) {
+      const weatherDiv = document.getElementById("weather");
+      const tipsDiv = document.getElementById("tips");
+
+      weatherDiv.innerHTML = "🌍 Fetching weather based on your location...";
+      tipsDiv.innerHTML = "";
+
+      try {
+        const response = await fetch(`https://wttr.in/${lat},${lon}?format=j1`);
+        const data = await response.json();
+
+        const area = data.nearest_area[0].areaName[0].value;
+        const country = data.nearest_area[0].country[0].value;
+        const current = data.current_condition[0];
+        const temp = parseInt(current.temp_C);
+        const desc = current.weatherDesc[0].value.toLowerCase();
+        const humidity = parseInt(current.humidity);
+        const wind = current.windspeedKmph;
+
+        weatherDiv.innerHTML = `
+          📍 <strong>${area}, ${country}</strong><br>
+          🌡 Temp: ${temp}°C<br>
+          🌥 Condition: ${desc}<br>
+          💧 Humidity: ${humidity}%<br>
+          💨 Wind: ${wind} km/h
+        `;
+
+        let tip = "";
+
+        if (temp >= 32) {
+          tip = "🔥 Hot day! Stay hydrated and reduce outdoor water use.";
+        } else if (temp <= 5) {
+          tip = "❄️ Cold weather! Insulate water pipes and store clean water.";
+        } else if (desc.includes("rain")) {
+          tip = "🌧 It's raining. Turn off garden sprinklers and reuse rainwater!";
+        } else if (humidity > 80) {
+          tip = "💦 Humid air. Watch out for mold and store water safely.";
+        } else if (desc.includes("sunny") && humidity < 30) {
+          tip = "☀️ Dry and sunny. Use mulch to retain soil moisture.";
+        } else {
+          tip = "💧 Keep water use smart and steady.";
+        }
+
+        tipsDiv.innerHTML = tip;
+
+      } catch (err) {
+        weatherDiv.innerHTML = "❌ Couldn't fetch weather based on your location.";
+        tipsDiv.innerHTML = "";
+      }
+    }
+  </script>
+
+</body>
+</html>
